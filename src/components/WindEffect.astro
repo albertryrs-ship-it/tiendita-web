@@ -1,0 +1,31 @@
+---
+// Capa del efecto de viento. Solo el canvas y el script: el hero, las imágenes de la mascota y el
+// botón de pausa se marcan con data-wind-* en la página (ver index.astro y src/scripts/wind.ts).
+// Va en la página que lo usa, no en Layout: las demás páginas no cargan nada.
+---
+
+<canvas class="wind" data-wind-canvas aria-hidden="true"></canvas>
+
+<script>
+	import { initWind } from '../scripts/wind';
+
+	initWind();
+</script>
+
+<style>
+	/* Por encima del contenido y por debajo del header (z-index 50). No intercepta clics ni foco. */
+	.wind {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 40;
+		pointer-events: none;
+	}
+
+	@media print {
+		.wind {
+			display: none;
+		}
+	}
+</style>

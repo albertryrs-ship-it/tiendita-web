@@ -44,6 +44,18 @@ Panda rojo con casco y chaleco de obra, recortado de una hoja de 8 poses (fondo 
 
 Se alterna solo con CSS, con el mismo estado que usan los tokens (ver `src/pages/index.astro`). Las dos imágenes se cargan siempre (≈ 27 kB cada una) para que el cambio de tema no deje un hueco; se dimensionan por **alto** porque sus proporciones difieren. Son decorativas (`alt=""`). Resolución de origen ≈ 300×430: si se tiene una versión mayor, reemplazar los archivos. En oscuro la pose lleva un borde claro finísimo (`drop-shadow`) porque su contorno negro se pierde contra el fondo.
 
+## Viento
+
+Experimento del hero: un viento sopla **de izquierda a derecha contra la mascota** (que mira hacia la izquierda). Hojas cruzan toda la pantalla, esquivan al personaje y él se afirma contra el viento (se inclina ~3–5° apoyado en los pies, con un leve temblor en las ráfagas).
+
+- **Motor:** `src/scripts/wind.ts` (canvas 2D, sin librerías, ~2.6 kB comprimido). `src/components/WindEffect.astro` pone el canvas y carga el script; solo la página de inicio lo usa.
+- **Contrato con el HTML:** `[data-wind-zone]` (el hero: el efecto corre solo mientras se ve), `[data-wind-target]` (imágenes de la mascota), `[data-wind-quiet]` (bloques de texto: las hojas se atenúan encima para no estorbar la lectura), `[data-wind-toggle]` (botón de pausa).
+- **Colores:** tokens `--leaf-1..3` en `tokens.css` (verdes en claro, grises en oscuro).
+- **Accesibilidad:** con `prefers-reduced-motion: reduce` no corre nada (ni en caliente) y el botón se oculta. "Pausar viento" lo detiene y la preferencia se guarda en `localStorage`. La capa es `aria-hidden` y no intercepta clics.
+- **Rendimiento:** solo corre con el hero visible y la pestaña activa (fuera: 0 fotogramas por segundo). Escala `devicePixelRatio` con tope 2. Si los fotogramas promedian > 24 ms durante 1.5 s, baja un 30 % las hojas (mínimo 8). Medido con CPU ×4 en escritorio y ×6 en móvil: 60 fps, sin tareas largas ni desplazamiento de layout.
+- **Afinar:** constantes al inicio de `wind.ts` (`LEAN_*`, `BASE_SPEED`, `QUIET_ALPHA`...); cantidad y tamaño de hojas en `targetCount()` y `makeLeaf()`. Para invertir la inclinación ("empujado hacia atrás" en vez de "afirmándose"), `LEAN_DIRECTION = 1`.
+- **Quitarlo:** borrar `<WindEffect />`, los `data-wind-*` y el botón de `index.astro`; el resto no depende de él.
+
 ## Contenido
 
 No se inventan precios, funciones, cifras ni reseñas. Lo que no esté confirmado se deja fuera del menú y del sitemap. wuju.dev describe hoy a Mi Tiendita como "en definición".

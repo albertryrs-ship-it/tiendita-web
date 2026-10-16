@@ -3,15 +3,16 @@
 // La Fase 1 lo reemplaza sección por sección. Mientras tanto va con noindex.
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
+import WindEffect from '../components/WindEffect.astro';
 import { cta } from '../data/site';
 import mascotaClaro from '../assets/mascota-senalando.png';
 import mascotaOscuro from '../assets/mascota-saludando.png';
 ---
 
 <Layout title="Mi Tiendita: punto de venta para tiendas locales" noindex>
-	<section class="band hero">
+	<section class="band hero" data-wind-zone>
 		<div class="container hero-grid">
-			<div class="copy">
+			<div class="copy" data-wind-quiet>
 				<p class="eyebrow">Un producto de WUJU</p>
 				<h1>Vendé, controlá y <em>decidí</em> mejor en tu tienda</h1>
 				<p class="lead">
@@ -29,6 +30,7 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 					Cambia de pose con el tema: señalando en claro, saludando en oscuro.
 					Las dos se cargan (eager) para que el cambio de tema no deje un hueco mientras baja la otra;
 					solo se muestra la del tema activo (ver CSS). La de claro es la prioritaria.
+					data-wind-target: el efecto de viento inclina la que esté visible (src/scripts/wind.ts).
 				*/
 			}
 			<Image
@@ -40,6 +42,7 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 				quality={90}
 				loading="eager"
 				fetchpriority="high"
+				data-wind-target
 			/>
 			<Image
 				class="mascot mascot-dark"
@@ -50,9 +53,14 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 				quality={90}
 				loading="eager"
 				fetchpriority="low"
+				data-wind-target
 			/>
+			{/* Invisible (pero con su espacio reservado, para no mover el layout) hasta que el script activa el efecto; siempre invisible con movimiento reducido. */}
+			<button type="button" class="wind-toggle" data-wind-toggle>Pausar viento</button>
 		</div>
 	</section>
+
+	<WindEffect />
 
 	<section class="section" id="muestrario">
 		<div class="container">
@@ -86,18 +94,53 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 		padding-block: clamp(4rem, 9vw, 8rem);
 	}
 
-	/* Móvil: texto y debajo la mascota, a la derecha. Escritorio: dos columnas. */
+	/* Móvil: texto, debajo la mascota (a la derecha) y debajo el botón de pausa. Escritorio: dos columnas. */
 	.hero-grid {
 		display: grid;
-		gap: 2rem;
+		grid-template-areas: 'copy' 'mascot' 'pause';
+		row-gap: 0;
 		align-items: center;
+	}
+
+	.copy {
+		grid-area: copy;
+		margin-bottom: 2rem;
 	}
 
 	/* Se dimensiona por alto: las dos poses tienen proporciones distintas y así no cambian de tamaño al alternar. */
 	.mascot {
+		grid-area: mascot;
 		height: clamp(12rem, 52vw, 16rem);
 		width: auto;
 		justify-self: end;
+		/* El efecto de viento (src/scripts/wind.ts) la inclina con un transform en línea, apoyada en los pies. */
+		transform-origin: 50% 100%;
+		will-change: transform;
+	}
+
+	/* Botón de texto, sin relleno (el único relleno de la pantalla es el CTA). */
+	.wind-toggle {
+		grid-area: pause;
+		justify-self: end;
+		min-height: 2.75rem;
+		padding: 0 0.5rem;
+		border: 0;
+		background: none;
+		border-radius: var(--radius-sm);
+		color: var(--muted);
+		font-size: var(--fs-small);
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+		cursor: pointer;
+	}
+
+	.wind-toggle:hover {
+		color: var(--text);
+	}
+
+	/* visibility:hidden también lo saca del orden de tabulación y de los lectores de pantalla. */
+	.wind-toggle:not([data-active]) {
+		visibility: hidden;
 	}
 
 	/* Una pose por tema (señalando en claro, saludando en oscuro), con el mismo estado que usan los tokens. */
@@ -128,11 +171,20 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 	@media (min-width: 60rem) {
 		.hero-grid {
 			grid-template-columns: minmax(0, 1fr) auto;
-			gap: 3rem;
+			grid-template-areas: 'copy mascot' 'copy pause';
+			column-gap: 3rem;
+		}
+
+		.copy {
+			margin-bottom: 0;
 		}
 
 		.mascot {
 			height: clamp(20rem, 31vw, 25rem);
+		}
+
+		.wind-toggle {
+			justify-self: center;
 		}
 	}
 
