@@ -7,12 +7,9 @@
  *   [data-wind-zone]           el hero: el efecto corre solo mientras se ve
  *   [data-wind-target]         imágenes de la mascota (se mueve la que está visible)
  *   [data-wind-quiet]          bloques de texto: sobre ellos las hojas se atenúan para no estorbar la lectura
- *   button[data-wind-toggle]   pausar / reanudar
  *
  * Colores: tokens --leaf-1..3 de tokens.css (verdes en claro, grises en oscuro).
  */
-
-const STORAGE_KEY = 'wind-paused';
 
 /** -1 = el personaje se afirma contra el viento (se inclina hacia donde mira); 1 = empujado hacia atrás. */
 const LEAN_DIRECTION = -1;
@@ -77,7 +74,6 @@ function windAt(t: number): { wind: number; gust: number } {
 export function initWind(): void {
 	const canvas = document.querySelector<HTMLCanvasElement>('[data-wind-canvas]');
 	const zone = document.querySelector<HTMLElement>('[data-wind-zone]');
-	const button = document.querySelector<HTMLButtonElement>('[data-wind-toggle]');
 	const targets = Array.from(document.querySelectorAll<HTMLElement>('[data-wind-target]'));
 	const quietEls = Array.from(document.querySelectorAll<HTMLElement>('[data-wind-quiet]'));
 	const ctx = canvas?.getContext('2d');
@@ -88,7 +84,6 @@ export function initWind(): void {
 	const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 	let reduced = reducedQuery.matches;
-	let paused = readPaused();
 	let inView = false;
 	let width = 0;
 	let height = 0;
@@ -110,36 +105,13 @@ export function initWind(): void {
 
 	// ---------- utilidades de estado ----------
 
-	function readPaused(): boolean {
-		try {
-			return localStorage.getItem(STORAGE_KEY) === '1';
-		} catch {
-			return false;
-		}
-	}
-
-	function savePaused(value: boolean): void {
-		try {
-			localStorage.setItem(STORAGE_KEY, value ? '1' : '0');
-		} catch {
-			/* sin almacenamiento: la preferencia dura solo esta visita */
-		}
-	}
-
 	function shouldRun(): boolean {
-		return inView && !paused && !reduced && !document.hidden;
+		return inView && !reduced && !document.hidden;
 	}
 
 	function setState(state: string): void {
 		canvas!.dataset.windState = state;
 		canvas!.dataset.windLeaves = String(leaves.length);
-	}
-
-	function updateButton(): void {
-		if (!button) return;
-		button.textContent = paused ? 'Reanudar viento' : 'Pausar viento';
-		// Se muestra con visibility (no con display): el botón ocupa su sitio desde el principio y no mueve el layout.
-		button.toggleAttribute('data-active', !reduced);
 	}
 
 	// ---------- geometría ----------
@@ -360,7 +332,7 @@ export function initWind(): void {
 		ctx!.setTransform(1, 0, 0, 1, 0, 0);
 		ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 		resetLean();
-		setState(reduced ? 'reduced' : paused ? 'paused' : 'idle');
+		setState(reduced ? 'reduced' : 'idle');
 	}
 
 	/** Reevalúa si el efecto debe correr. Con movimiento reducido se apaga al instante, sin fundido. */
@@ -390,7 +362,6 @@ export function initWind(): void {
 
 	function setup(): void {
 		readPalette();
-		updateButton();
 		resize();
 
 		new ResizeObserver(() => resize()).observe(canvas!);
@@ -403,7 +374,6 @@ export function initWind(): void {
 
 		reducedQuery.addEventListener?.('change', () => {
 			reduced = reducedQuery.matches;
-			updateButton();
 			evaluate();
 		});
 
@@ -417,14 +387,7 @@ export function initWind(): void {
 			{ threshold: 0.05 },
 		).observe(zone!);
 
-		button?.addEventListener('click', () => {
-			paused = !paused;
-			savePaused(paused);
-			updateButton();
-			evaluate();
-		});
-
-		setState(reduced ? 'reduced' : paused ? 'paused' : 'idle');
+		setState(reduced ? 'reduced' : 'idle');
 	}
 
 	// Tras la carga y cuando el navegador esté ocioso: no compite con LCP ni INP.

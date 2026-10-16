@@ -55,8 +55,6 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 				fetchpriority="low"
 				data-wind-target
 			/>
-			{/* Invisible (pero con su espacio reservado, para no mover el layout) hasta que el script activa el efecto; siempre invisible con movimiento reducido. */}
-			<button type="button" class="wind-toggle" data-wind-toggle>Pausar viento</button>
 		</div>
 	</section>
 
@@ -94,10 +92,10 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 		padding-block: clamp(4rem, 9vw, 8rem);
 	}
 
-	/* Móvil: texto, debajo la mascota (a la derecha) y debajo el botón de pausa. Escritorio: dos columnas. */
+	/* Móvil: texto y debajo la mascota, a la derecha. Escritorio: dos columnas. */
 	.hero-grid {
 		display: grid;
-		grid-template-areas: 'copy' 'mascot' 'pause';
+		grid-template-areas: 'copy' 'mascot';
 		row-gap: 0;
 		align-items: center;
 	}
@@ -116,31 +114,6 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 		/* El efecto de viento (src/scripts/wind.ts) la inclina con un transform en línea, apoyada en los pies. */
 		transform-origin: 50% 100%;
 		will-change: transform;
-	}
-
-	/* Botón de texto, sin relleno (el único relleno de la pantalla es el CTA). */
-	.wind-toggle {
-		grid-area: pause;
-		justify-self: end;
-		min-height: 2.75rem;
-		padding: 0 0.5rem;
-		border: 0;
-		background: none;
-		border-radius: var(--radius-sm);
-		color: var(--muted);
-		font-size: var(--fs-small);
-		text-decoration: underline;
-		text-underline-offset: 0.25em;
-		cursor: pointer;
-	}
-
-	.wind-toggle:hover {
-		color: var(--text);
-	}
-
-	/* visibility:hidden también lo saca del orden de tabulación y de los lectores de pantalla. */
-	.wind-toggle:not([data-active]) {
-		visibility: hidden;
 	}
 
 	/* Una pose por tema (señalando en claro, saludando en oscuro), con el mismo estado que usan los tokens. */
@@ -171,7 +144,7 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 	@media (min-width: 60rem) {
 		.hero-grid {
 			grid-template-columns: minmax(0, 1fr) auto;
-			grid-template-areas: 'copy mascot' 'copy pause';
+			grid-template-areas: 'copy mascot';
 			column-gap: 3rem;
 		}
 
@@ -181,10 +154,6 @@ import mascotaOscuro from '../assets/mascota-saludando.png';
 
 		.mascot {
 			height: clamp(20rem, 31vw, 25rem);
-		}
-
-		.wind-toggle {
-			justify-self: center;
 		}
 	}
 
