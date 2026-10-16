@@ -1,0 +1,262 @@
+/* Reset, base y las pocas piezas compartidas. Todo lo demás vive en cada componente. */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+	scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+body {
+	margin: 0;
+	min-height: 100svh;
+	display: flex;
+	flex-direction: column;
+	font-family: var(--font-brand, system-ui, sans-serif);
+	font-size: var(--fs-body);
+	line-height: 1.6;
+	background: var(--bg);
+	color: var(--text);
+	-webkit-font-smoothing: antialiased;
+}
+
+main {
+	flex: 1;
+}
+
+/* Destino del enlace "Saltar al contenido": recibe foco sin mostrar aro. */
+main:focus {
+	outline: none;
+}
+
+h1,
+h2,
+h3 {
+	margin: 0;
+	color: var(--heading);
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	font-weight: 700;
+	text-wrap: balance;
+}
+
+h1 {
+	font-size: var(--fs-h1);
+}
+h2 {
+	font-size: var(--fs-h2);
+}
+h3 {
+	font-size: var(--fs-h3);
+	line-height: 1.25;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+ul,
+ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+img,
+svg,
+video {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+a {
+	color: var(--accent);
+	text-underline-offset: 0.25em;
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+	border-radius: var(--radius-sm);
+}
+
+::selection {
+	background: var(--accent);
+	color: var(--bg);
+}
+
+button {
+	font: inherit;
+	color: inherit;
+}
+
+/* ---- Piezas compartidas ---- */
+
+.container {
+	width: min(100% - 2 * var(--gutter), var(--content-max));
+	margin-inline: auto;
+}
+
+.section {
+	padding-block: var(--section-space);
+}
+
+/*
+ * Banda (hero, CTA final, footer): un paso más gris que la base. Mismo texto, acento y botón;
+ * solo cambian el fondo y el gris atenuado. Sus bordes se funden con el fondo de la página
+ * (parte transparente del degradado) en vez de cortarse en línea recta.
+ * Tres capas: fundido superior, fundido inferior y el tramo sólido del medio (con 1px de
+ * solape para que no asome una costura). --fade-top / --fade-bottom se pueden ajustar por banda.
+ */
+.band {
+	--bg: var(--band-bg);
+	--muted: var(--band-muted);
+	--fade-top: clamp(3rem, 8vw, 7rem);
+	--fade-bottom: clamp(3rem, 8vw, 7rem);
+	--fade-curve: transparent, var(--band-bg); /* respaldo lineal */
+	background:
+		linear-gradient(to bottom, var(--fade-curve)) top / 100% var(--fade-top) no-repeat,
+		linear-gradient(to top, var(--fade-curve)) bottom / 100% var(--fade-bottom) no-repeat,
+		linear-gradient(var(--band-bg), var(--band-bg)) 0 calc(var(--fade-top) - 1px) / 100%
+			calc(100% - var(--fade-top) - var(--fade-bottom) + 2px) no-repeat;
+}
+
+/* Curva suavizada (smoothstep): evita el "borde" que se percibe donde un degradado lineal empieza y termina. */
+@supports (color: color-mix(in srgb, red, blue)) {
+	.band {
+		--fade-curve:
+			transparent 0%,
+			color-mix(in srgb, var(--band-bg) 3%, transparent) 10%,
+			color-mix(in srgb, var(--band-bg) 10%, transparent) 20%,
+			color-mix(in srgb, var(--band-bg) 22%, transparent) 30%,
+			color-mix(in srgb, var(--band-bg) 35%, transparent) 40%,
+			color-mix(in srgb, var(--band-bg) 50%, transparent) 50%,
+			color-mix(in srgb, var(--band-bg) 65%, transparent) 60%,
+			color-mix(in srgb, var(--band-bg) 78%, transparent) 70%,
+			color-mix(in srgb, var(--band-bg) 90%, transparent) 80%,
+			color-mix(in srgb, var(--band-bg) 97%, transparent) 90%,
+			var(--band-bg) 100%;
+	}
+}
+
+/* Etiqueta pequeña sobre un título. Texto, no cápsula. */
+.eyebrow {
+	margin: 0 0 1rem;
+	font-size: var(--fs-small);
+	font-weight: 600;
+	letter-spacing: var(--tracking-caps);
+	text-transform: uppercase;
+	color: var(--accent);
+}
+
+.lead {
+	font-size: var(--fs-lead);
+	color: var(--muted);
+	max-width: var(--measure);
+}
+
+/* Línea fina punteada, como bajo los títulos de wuju.dev. */
+.rule {
+	border: 0;
+	border-top: 1px dashed var(--rule);
+	margin: 0;
+}
+
+/* Único botón relleno por pantalla. */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 2.75rem;
+	padding: 0.5rem 1.375rem;
+	border: 0;
+	border-radius: var(--radius-pill);
+	background: var(--btn-bg);
+	color: var(--btn-ink);
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.btn:hover {
+	filter: brightness(1.08);
+}
+
+/* Acción secundaria: enlace con flecha. */
+.link-arrow {
+	font-weight: 600;
+	text-decoration: none;
+	color: var(--accent);
+}
+
+/* La flecha se dibuja con máscara: Noto Sans (subset latin) no trae "→" y caería a otra fuente. */
+.link-arrow::after {
+	content: '';
+	display: inline-block;
+	width: 1em;
+	height: 0.75em;
+	margin-inline-start: 0.4em;
+	vertical-align: -0.05em;
+	background: currentColor;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 12'%3E%3Cpath d='M0 6h14M9 1l5 5-5 5' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 12'%3E%3Cpath d='M0 6h14M9 1l5 5-5 5' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat;
+	transition: transform 0.15s ease;
+}
+
+.link-arrow:hover::after {
+	transform: translateX(0.25em);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.link-arrow::after {
+		transition: none;
+	}
+}
+
+/* Duración del fundido al cambiar de tema (View Transitions). */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.3s;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.skip-link {
+	position: absolute;
+	inset-block-start: 0.5rem;
+	inset-inline-start: 0.5rem;
+	z-index: 100;
+	padding: 0.5rem 1rem;
+	background: var(--btn-bg);
+	color: var(--btn-ink);
+	border-radius: var(--radius-sm);
+	transform: translateY(-200%);
+}
+
+.skip-link:focus {
+	transform: none;
+}

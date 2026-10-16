@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { mainNav } from '../data/site';
+---
+
+<Layout title="Página no encontrada" description="No encontramos la página que buscás." noindex>
+	<section class="section">
+		<div class="container">
+			<p class="eyebrow">Error 404</p>
+			<h1>No encontramos esa página</h1>
+			<p class="lead">Puede que el enlace haya cambiado. Probá con alguna de estas secciones.</p>
+			<ul>
+				<li><a class="link-arrow" href="/">Inicio</a></li>
+				{
+					mainNav.map((link) => (
+						<li>
+							<a class="link-arrow" href={link.href}>
+								{link.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.lead {
+		margin-top: 1.25rem;
+	}
+
+	ul {
+		display: grid;
+		gap: 0.5rem;
+		margin-top: 2rem;
+	}
+</style>

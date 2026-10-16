@@ -1,11 +1,192 @@
 ---
-import Welcome from '../components/Welcome.astro';
+// ANDAMIO DE LA FASE 0: sirve para evaluar tokens, tipografía y ambos temas.
+// La Fase 1 lo reemplaza sección por sección. Mientras tanto va con noindex.
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { cta } from '../data/site';
+import mascotaClaro from '../assets/mascota-senalando.png';
+import mascotaOscuro from '../assets/mascota-saludando.png';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Mi Tiendita: punto de venta para tiendas locales" noindex>
+	<section class="band hero">
+		<div class="container hero-grid">
+			<div class="copy">
+				<p class="eyebrow">Un producto de WUJU</p>
+				<h1>Vendé, controlá y <em>decidí</em> mejor en tu tienda</h1>
+				<p class="lead">
+					Registrá tus ventas, controlá tu inventario y mirá qué conviene reponer, desde un punto de venta pensado
+					para tiendas como la tuya.
+				</p>
+				<p class="actions">
+					<a class="btn" href={cta.href}>{cta.label}</a>
+					<a class="link-arrow" href="#muestrario">Mirá el muestrario</a>
+				</p>
+			</div>
+			{
+				/*
+					Decorativa (alt vacío): no aporta información que el texto no diga.
+					Cambia de pose con el tema: señalando en claro, saludando en oscuro.
+					Las dos se cargan (eager) para que el cambio de tema no deje un hueco mientras baja la otra;
+					solo se muestra la del tema activo (ver CSS). La de claro es la prioritaria.
+				*/
+			}
+			<Image
+				class="mascot mascot-light"
+				src={mascotaClaro}
+				alt=""
+				width={336}
+				height={430}
+				quality={90}
+				loading="eager"
+				fetchpriority="high"
+			/>
+			<Image
+				class="mascot mascot-dark"
+				src={mascotaOscuro}
+				alt=""
+				width={295}
+				height={431}
+				quality={90}
+				loading="eager"
+				fetchpriority="low"
+			/>
+		</div>
+	</section>
+
+	<section class="section" id="muestrario">
+		<div class="container">
+			<p class="eyebrow">Muestrario temporal</p>
+			<h2>Tipografía y espacio, sin cajas</h2>
+			<hr class="rule" />
+			<ol class="steps">
+				<li>
+					<span class="num">01</span>
+					<h3>Listas con numeral</h3>
+					<p>Una grilla de dos columnas y una línea punteada. No hace falta una tarjeta para ordenar ideas.</p>
+				</li>
+				<li>
+					<span class="num">02</span>
+					<h3>Un solo botón relleno</h3>
+					<p>La acción principal es la única con fondo. Lo secundario es un enlace con flecha.</p>
+				</li>
+				<li>
+					<span class="num">03</span>
+					<h3>Dos temas</h3>
+					<p>Claro en blanco y grises con acento verde; oscuro en negro, grises y blanco, con el interruptor.</p>
+				</li>
+			</ol>
+			<p><a class="link-arrow" href="/funciones/">Ver funciones</a></p>
+		</div>
+	</section>
 </Layout>
+
+<style>
+	.hero {
+		padding-block: clamp(4rem, 9vw, 8rem);
+	}
+
+	/* Móvil: texto y debajo la mascota, a la derecha. Escritorio: dos columnas. */
+	.hero-grid {
+		display: grid;
+		gap: 2rem;
+		align-items: center;
+	}
+
+	/* Se dimensiona por alto: las dos poses tienen proporciones distintas y así no cambian de tamaño al alternar. */
+	.mascot {
+		height: clamp(12rem, 52vw, 16rem);
+		width: auto;
+		justify-self: end;
+	}
+
+	/* Una pose por tema (señalando en claro, saludando en oscuro), con el mismo estado que usan los tokens. */
+	.mascot-dark {
+		display: none;
+		/* En oscuro el contorno negro se pierde contra el fondo: un borde claro finísimo devuelve la silueta. */
+		filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.6));
+	}
+
+	:global(:root[data-theme='dark']) .mascot-light {
+		display: none;
+	}
+
+	:global(:root[data-theme='dark']) .mascot-dark {
+		display: block;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .mascot-light {
+			display: none;
+		}
+
+		:global(:root:not([data-theme='light'])) .mascot-dark {
+			display: block;
+		}
+	}
+
+	@media (min-width: 60rem) {
+		.hero-grid {
+			grid-template-columns: minmax(0, 1fr) auto;
+			gap: 3rem;
+		}
+
+		.mascot {
+			height: clamp(20rem, 31vw, 25rem);
+		}
+	}
+
+	h1 {
+		max-width: 22ch;
+	}
+
+	/* Énfasis en itálica (Noto Sans) más color de acento. En oscuro el acento es blanco, así que la itálica es lo que lo distingue. */
+	h1 em {
+		font-style: italic;
+		color: var(--accent);
+	}
+
+	.hero .lead {
+		margin-top: 1.5rem;
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 1.75rem;
+		margin-top: 2.5rem;
+	}
+
+	#muestrario h2 {
+		max-width: 20ch;
+		margin-bottom: 2rem;
+	}
+
+	.steps {
+		margin-block: 2rem;
+	}
+
+	.steps li {
+		display: grid;
+		grid-template-columns: 3.5rem 1fr;
+		column-gap: 1rem;
+		padding-block: 1.75rem;
+		border-bottom: 1px dashed var(--rule);
+	}
+
+	.num {
+		grid-row: span 2;
+		font-weight: 600;
+		color: var(--accent);
+	}
+
+	.steps h3 {
+		margin-bottom: 0.5rem;
+	}
+
+	.steps p {
+		color: var(--muted);
+		max-width: var(--measure);
+	}
+</style>

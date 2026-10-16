@@ -1,0 +1,213 @@
+---
+import { site, mainNav, cta } from '../data/site';
+import ThemeToggle from './ThemeToggle.astro';
+
+const path = Astro.url.pathname;
+
+// Exacto = página actual; prefijo = estamos dentro de esa sección (p. ej. /funciones/inventario/).
+function current(href: string) {
+	if (path === href) return 'page';
+	if (path.startsWith(href)) return 'true';
+	return undefined;
+}
+---
+
+<header class="site-header">
+	<div class="container bar">
+		<a class="brand" href="/" aria-label={`${site.name}, inicio`}>{site.name}</a>
+		<a class="parent" href={site.parent.url}>por {site.parent.name} <span aria-hidden="true">↗</span></a>
+
+		<nav id="site-nav" aria-label="Principal">
+			<ul>
+				{
+					mainNav.map((link) => (
+						<li>
+							<a href={link.href} aria-current={current(link.href)}>
+								{link.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<ThemeToggle where="menu" />
+		</nav>
+
+		<a class="btn cta" href={cta.href}>{cta.label}</a>
+		<ThemeToggle where="bar" />
+
+		<button
+			type="button"
+			class="menu-btn"
+			data-menu-toggle
+			aria-expanded="false"
+			aria-controls="site-nav"
+			aria-label="Menú"
+		>
+			<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<path class="open" d="M4 7h16M4 12h16M4 17h16"></path>
+				<path class="close" d="M6 6l12 12M18 6L6 18"></path>
+			</svg>
+		</button>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: var(--bg);
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.bar {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-height: var(--header-h);
+	}
+
+	.brand {
+		font-size: 1.125rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: var(--text);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.parent {
+		display: none;
+		font-size: var(--fs-small);
+		color: var(--muted);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.parent:hover {
+		color: var(--accent);
+	}
+
+	.cta {
+		margin-inline-start: auto;
+		min-height: 2.5rem;
+		padding-inline: 1.125rem;
+		font-size: var(--fs-small);
+		white-space: nowrap;
+	}
+
+	.menu-btn {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+	}
+
+	.menu-btn .close,
+	.menu-btn[aria-expanded='true'] .open {
+		display: none;
+	}
+
+	.menu-btn[aria-expanded='true'] .close {
+		display: inline;
+	}
+
+	/* ---- Móvil (< 60rem) ---- */
+	@media (max-width: 59.999rem) {
+		.bar {
+			flex-wrap: wrap;
+		}
+
+		/* Sin JS: el menú queda visible debajo de la barra, apilado. */
+		nav {
+			order: 10;
+			flex-basis: 100%;
+			padding-bottom: 1rem;
+		}
+
+		nav ul {
+			display: flex;
+			flex-direction: column;
+		}
+
+		nav a {
+			display: block;
+			padding: 0.875rem 0;
+			font-size: 1.125rem;
+			color: var(--text);
+			text-decoration: none;
+			border-bottom: 1px dashed var(--rule);
+		}
+
+		nav a[aria-current] {
+			color: var(--accent);
+		}
+
+		/* Con JS: el menú se pliega y se abre como hoja a pantalla completa. */
+		:global(.js) .menu-btn {
+			display: inline-flex;
+		}
+
+		:global(.js) nav {
+			display: none;
+		}
+
+		/* Con la hoja abierta, la página de fondo no se desplaza. */
+		:global(html.menu-open) {
+			overflow: hidden;
+		}
+
+		:global(.js.menu-open) nav {
+			display: block;
+			position: fixed;
+			inset: var(--header-h) 0 0 0;
+			padding: 0.5rem var(--gutter) 2rem;
+			background: var(--bg);
+			overflow-y: auto;
+		}
+	}
+
+	/* ---- Escritorio (>= 60rem) ---- */
+	@media (min-width: 60rem) {
+		.bar {
+			gap: 1rem;
+		}
+
+		.parent {
+			display: inline;
+		}
+
+		nav {
+			margin-inline-start: 1.5rem;
+		}
+
+		nav ul {
+			display: flex;
+			gap: 1.75rem;
+		}
+
+		nav a {
+			padding-block: 0.5rem;
+			color: var(--text);
+			text-decoration: none;
+			border-bottom: 2px solid transparent;
+		}
+
+		nav a:hover {
+			color: var(--accent);
+		}
+
+		nav a[aria-current] {
+			border-bottom-color: var(--accent);
+		}
+
+		.cta {
+			font-size: var(--fs-body);
+		}
+	}
+</style>

@@ -1,0 +1,77 @@
+---
+import { site } from '../data/site';
+import JsonLd from './JsonLd.astro';
+
+interface Crumb {
+	label: string;
+	/** Ruta absoluta del sitio ("/funciones/"). La última migaja (página actual) no lleva. */
+	href?: string;
+}
+
+interface Props {
+	items: Crumb[];
+}
+
+const { items } = Astro.props;
+const trail: Crumb[] = [{ label: 'Inicio', href: '/' }, ...items];
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: trail.map((crumb, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: crumb.label,
+		...(crumb.href ? { item: new URL(crumb.href, site.url).href } : {}),
+	})),
+};
+---
+
+<nav class="crumbs" aria-label="Migas de pan">
+	<ol>
+		{
+			trail.map((crumb, i) => (
+				<li>
+					{i < trail.length - 1 && crumb.href ? (
+						<a href={crumb.href}>{crumb.label}</a>
+					) : (
+						<span aria-current="page">{crumb.label}</span>
+					)}
+				</li>
+			))
+		}
+	</ol>
+</nav>
+
+<JsonLd data={jsonLd} />
+
+<style>
+	.crumbs {
+		padding-block: 1.25rem 0;
+		font-size: var(--fs-small);
+	}
+
+	ol {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.5rem;
+	}
+
+	li + li::before {
+		content: '/';
+		margin-inline-end: 0.5rem;
+		color: var(--rule);
+	}
+
+	a {
+		color: var(--muted);
+	}
+
+	a:hover {
+		color: var(--accent);
+	}
+
+	[aria-current] {
+		color: var(--text);
+	}
+</style>

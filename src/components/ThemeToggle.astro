@@ -1,0 +1,96 @@
+---
+// Interruptor claro/oscuro. La lógica vive en el script en línea de Layout.astro
+// (delegación por [data-theme-toggle]); este componente solo pinta el botón.
+// "bar" = barra del header (escritorio) · "menu" = dentro del menú desplegable (móvil).
+interface Props {
+	where: 'bar' | 'menu';
+}
+
+const { where } = Astro.props;
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle data-where={where} aria-label="Cambiar tema">
+	<svg class="icon icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<circle cx="12" cy="12" r="4"></circle>
+		<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+	</svg>
+	<svg class="icon icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+	</svg>
+	<span class="label">Cambiar tema</span>
+</button>
+
+<style>
+	/* Sin JS el botón no haría nada: solo se muestra cuando Layout marca <html class="js">. */
+	.theme-toggle {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		min-width: 2.75rem;
+		height: 2.75rem;
+		padding: 0;
+		border: 1px solid var(--rule);
+		border-radius: var(--radius-pill);
+		background: transparent;
+		color: var(--text);
+		cursor: pointer;
+	}
+
+	.theme-toggle:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+
+	.label {
+		display: none;
+	}
+
+	/*
+	 * El icono muestra el modo activo: sol en claro, luna en oscuro. Se decide con el mismo
+	 * estado que usan los tokens (data-theme explícito, o el del sistema si no hay), solo con CSS:
+	 * sin JS y sin parpadeo al cargar.
+	 */
+	.icon-moon {
+		display: none;
+	}
+
+	:global(:root[data-theme='dark']) .icon-sun {
+		display: none;
+	}
+
+	:global(:root[data-theme='dark']) .icon-moon {
+		display: block;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .icon-sun {
+			display: none;
+		}
+
+		:global(:root:not([data-theme='light'])) .icon-moon {
+			display: block;
+		}
+	}
+
+	/* Móvil: el botón de la barra se oculta; el del menú se ve con texto. */
+	:global(.js) .theme-toggle[data-where='menu'] {
+		display: inline-flex;
+		padding-inline: 1rem;
+		margin-top: 1.5rem;
+	}
+
+	:global(.js) .theme-toggle[data-where='menu'] .label {
+		display: inline;
+	}
+
+	@media (min-width: 60rem) {
+		:global(.js) .theme-toggle[data-where='bar'] {
+			display: inline-flex;
+		}
+
+		:global(.js) .theme-toggle[data-where='menu'] {
+			display: none;
+		}
+	}
+</style>

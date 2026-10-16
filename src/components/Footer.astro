@@ -1,0 +1,128 @@
+---
+import { site, footerGroups } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="band">
+	<div class="container top">
+		<section class="about">
+			<p class="name">{site.name}</p>
+			<p class="muted">{site.tagline}.</p>
+			<p class="muted">Un producto de <a href={site.parent.url}>{site.parent.name}</a>.</p>
+		</section>
+
+		<nav class="groups" aria-label="Pie de página">
+			{
+				footerGroups.map((group) => (
+					<section>
+						<h2>{group.title}</h2>
+						<ul>
+							{group.links.map((link) => (
+								<li>
+									<a href={link.href}>
+										{link.label}
+										{link.external && <span aria-hidden="true"> ↗</span>}
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</nav>
+	</div>
+
+	<div class="container bottom">
+		<p>© {year} {site.parent.name}. Todos los derechos reservados.</p>
+		<p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+	</div>
+</footer>
+
+<style>
+	footer {
+		padding-block: clamp(3rem, 6vw, 5rem) 2rem;
+		/* Cierra la página: se funde por arriba y termina sólido abajo. */
+		--fade-top: clamp(2rem, 5vw, 4rem);
+		--fade-bottom: 0px;
+	}
+
+	.top {
+		display: grid;
+		gap: 2.5rem;
+	}
+
+	.name {
+		font-size: 1.25rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		margin-bottom: 0.5rem;
+	}
+
+	.muted {
+		color: var(--muted);
+	}
+
+	.about a {
+		text-decoration: underline;
+	}
+
+	.groups {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2rem 1.5rem;
+	}
+
+	h2 {
+		margin-bottom: 0.75rem;
+		font-size: var(--fs-small);
+		font-weight: 600;
+		letter-spacing: var(--tracking-caps);
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	li + li {
+		margin-top: 0.25rem;
+	}
+
+	a {
+		display: inline-block;
+		padding-block: 0.25rem;
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	a:hover {
+		color: var(--accent);
+		text-decoration: underline;
+	}
+
+	.bottom {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+		margin-top: 3rem;
+		padding-top: 1.5rem;
+		border-top: 1px dashed var(--rule);
+		font-size: var(--fs-small);
+		color: var(--muted);
+	}
+
+	.bottom a {
+		color: var(--muted);
+		text-decoration: underline;
+	}
+
+	@media (min-width: 60rem) {
+		.top {
+			grid-template-columns: 1fr 2.5fr;
+			gap: 4rem;
+		}
+
+		.groups {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+</style>

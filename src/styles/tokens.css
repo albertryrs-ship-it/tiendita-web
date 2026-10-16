@@ -1,0 +1,115 @@
+/*
+ * Tokens de Mi Tiendita.
+ * Claro: blanco + grises, con verde solo como acento. Oscuro: negro + grises + blanco (sin verde).
+ * Los cambios de sección son saltos de tono pequeños (una banda un paso más gris que la base),
+ * no cambios de color: blanco -> gris 100 en claro, negro -> gris 900 en oscuro.
+ * Tipografía: Noto Sans (variable), definida en astro.config.mjs. Radios y ritmo vienen de wuju.dev.
+ * Capas: primitivas -> set claro (por defecto) -> set oscuro (sistema o data-theme).
+ * Cada set define también --band-bg y --band-muted, que .band aplica por encima.
+ */
+
+:root {
+	/* Primitivas: verdes */
+	--green-50: #f0f7f2;
+	--green-100: #dcefe2;
+	--green-200: #b9dec6;
+	--green-300: #8cc7a1;
+	--green-400: #5aab79;
+	--green-500: #35905c;
+	--green-600: #277349;
+	--green-700: #205c3c;
+	--green-800: #1b4a32;
+	--green-900: #153a28;
+	--green-950: #0b2318;
+
+	/* Primitivas: grises neutros */
+	--gray-50: #f7f7f7;
+	--gray-100: #efefef;
+	--gray-200: #dedede;
+	--gray-300: #bfbfbf;
+	--gray-400: #949494;
+	--gray-500: #6e6e6e;
+	--gray-600: #565656;
+	--gray-700: #424242;
+	--gray-800: #2c2c2c;
+	--gray-900: #1b1b1b;
+	--gray-950: #0e0e0e;
+
+	--white: #ffffff;
+	--black: #0a0a0a;
+
+	/* Forma y ritmo */
+	--radius-sm: 0.5rem;
+	--radius-md: 0.875rem;
+	--radius-lg: 1.5rem;
+	--radius-pill: 999px;
+	--content-max: 1200px;
+	--measure: 62ch;
+	--gutter: clamp(1rem, 4vw, 2rem);
+	--section-space: clamp(5rem, 10vw, 9rem);
+	--header-h: 4rem;
+	/* Noto Sans no kernea T-E / T-R: con más seguimiento se abre un hueco bajo la T. */
+	--tracking-caps: 0.05em;
+
+	/* Escala tipográfica fluida */
+	--fs-small: 0.875rem;
+	--fs-body: 1rem;
+	--fs-lead: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+	--fs-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+	--fs-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+	--fs-h1: clamp(2.25rem, 1.6rem + 3.2vw, 4.25rem);
+
+	/* ---- Set claro (por defecto) ---- */
+	--bg: var(--white);
+	--heading: var(--green-950);
+	--text: var(--gray-800);
+	--muted: var(--gray-600);
+	--accent: var(--green-600);
+	--rule: var(--gray-300);
+	--btn-bg: var(--green-700);
+	--btn-ink: var(--white);
+
+	/* Banda (hero, CTA final, footer): un paso más gris que la base */
+	--band-bg: var(--gray-100);
+	--band-muted: var(--gray-600);
+
+	color-scheme: light dark;
+}
+
+/* ---- Set oscuro: por el sistema, salvo que el usuario haya forzado claro... ---- */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--bg: var(--black);
+		--heading: var(--white);
+		--text: var(--gray-200);
+		--muted: var(--gray-400);
+		--accent: var(--white);
+		--rule: var(--gray-700);
+		--btn-bg: var(--white);
+		--btn-ink: var(--black);
+
+		--band-bg: var(--gray-900);
+		--band-muted: var(--gray-300);
+	}
+}
+
+/* ...o elegido explícitamente con el interruptor. */
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	--bg: var(--black);
+	--heading: var(--white);
+	--text: var(--gray-200);
+	--muted: var(--gray-400);
+	--accent: var(--white);
+	--rule: var(--gray-700);
+	--btn-bg: var(--white);
+	--btn-ink: var(--black);
+
+	--band-bg: var(--gray-900);
+	--band-muted: var(--gray-300);
+}
+
+:root[data-theme='light'] {
+	color-scheme: light;
+}
