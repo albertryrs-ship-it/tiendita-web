@@ -8,6 +8,8 @@ export default defineConfig({
 	trailingSlash: 'always',
 	build: { format: 'directory' },
 	integrations: [sitemap()],
+	// Sin la barra flotante de desarrollo (solo existe en `astro dev`; no afecta al build).
+	devToolbar: { enabled: false },
 	fonts: [
 		{
 			// Noto Sans variable (100–900). El build la descarga de Google Fonts y la sirve desde
